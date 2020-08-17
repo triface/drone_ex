@@ -201,7 +201,7 @@ public class DroneControl extends Thread
 		System.out.println("Lifting all engines");
 		for (int i=0; i < n; i++)
 		{
-			engines[i].changePower(Engine.TAKEOFF_POWER, Engine.NUM_STEPS);
+			engines[i].changePower(Engine.TAKEOFF_POWER - Engine.HOVERING_POWER, Engine.NUM_STEPS);
 		}
 		stablePower = engines[0].getPower();
 		changeAltitude(TAKEOFF_ALTI);
