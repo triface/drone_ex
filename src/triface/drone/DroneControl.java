@@ -8,6 +8,8 @@ import java.util.TimerTask;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import triface.drone.Engine.ENGINE_STATUS;
+
 
 /**
  * Defines a drone with n engines and has methods for movement (roll, pitch and thrust)
@@ -98,7 +100,6 @@ public class DroneControl extends Thread
 		for (int i=0; i < n; i++)
 		{
 			engines[i] = new Engine(i, isClockwise, droneObs);
-			engines[i].changePower(Engine.HOVERING_POWER);
 			
 			if (i%2 == 0)
 				isClockwise = !isClockwise;
@@ -176,6 +177,7 @@ public class DroneControl extends Thread
 		System.out.println("Landing all engines");
 		for (int i=0; i < n; i++)
 		{
+			engines[i].setStatus(ENGINE_STATUS.READY);
 			engines[i].changePower(-1 * engines[i].getPower(), Engine.NUM_STEPS);
 		}
 		stablePower = 0;
@@ -201,7 +203,8 @@ public class DroneControl extends Thread
 		System.out.println("Lifting all engines");
 		for (int i=0; i < n; i++)
 		{
-			engines[i].changePower(Engine.TAKEOFF_POWER - Engine.HOVERING_POWER, Engine.NUM_STEPS);
+			engines[i].changePower(Engine.TAKEOFF_POWER, Engine.NUM_STEPS);
+			engines[i].setStatus(ENGINE_STATUS.ON);
 		}
 		stablePower = engines[0].getPower();
 		changeAltitude(TAKEOFF_ALTI);
@@ -300,7 +303,7 @@ public class DroneControl extends Thread
 			else if (!engines[i].isLeft())
 			{
 				System.out.println("Adjusting Right engine:" + engines[i].getEngineId());
-				engines[i].changePower(roll);
+				engines[i].changePower(-roll);
 				stablePower = engines[0].getPower();
 			}
 		}
@@ -327,10 +330,10 @@ public class DroneControl extends Thread
 		if (pitch > 0)
 		{
 			System.out.println("Adjusting Front engines");
-			engines[0].changePower(pitch);
+			engines[0].changePower(-pitch);
 			stablePower = engines[1].getPower();
 			if (n > 2)
-				engines[1].changePower(pitch);
+				engines[1].changePower(-pitch);
 		}
 		else
 		{

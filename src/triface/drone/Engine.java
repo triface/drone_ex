@@ -18,7 +18,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class Engine extends Observable
 {
-	public enum ENGINE_STATUS {OFF, ON};
+	public enum ENGINE_STATUS {OFF, READY, ON};
 	
 	private final static int MAX_POWER = 100;
 	public final static int HOVERING_POWER = 20;
@@ -42,7 +42,7 @@ public class Engine extends Observable
 		this.isClockwise = isClockwise;
 		if (id % 2 == 0)
 			isLeft = true;
-		status = ENGINE_STATUS.ON;
+		status = ENGINE_STATUS.READY;
 		this.addObserver(observer);
 		monitorTimer = new Timer();
 		monitorTimer.scheduleAtFixedRate(monitorTask, 1000, 1000);	
@@ -114,6 +114,10 @@ public class Engine extends Observable
 	
 	public String getStatus() {
 		return status.toString();
+	}
+
+	public void setStatus(ENGINE_STATUS newStatus) {
+		this.status = newStatus;
 	}
 	
 	private void incrementPower(int newPower, int stepSize)
